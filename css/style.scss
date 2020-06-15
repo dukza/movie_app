@@ -1,0 +1,17 @@
+@import 'short.scss';
+@import '../src/css/normalize.css';
+
+.gnb{
+    a{
+        color: $color-white;
+        display: inline-block;
+        text-decoration: none;
+        width: 100%;
+        &:hover{
+            color: $color-info;
+        }        
+    }
+    a.active{
+        color: $color-info;
+    }     
+}

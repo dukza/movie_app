@@ -1,68 +1,83 @@
 import React from 'react';
-// import Potato from './Potato';
-import PropTypes from "prop-types";
+import axios from 'axios';
 
-function Food({fav,picture,rating}){
-  // console.log(props);
-  return(
-    <>
-    <h3>I love {fav}</h3>
-    <div>{rating} / 5</div>
-    <img src={picture} alt={fav}/>
-    </>
-  )
-}
-Food.propTypes = {
-  fav:PropTypes.string.isRequired,
-  picture:PropTypes.string.isRequired,
-  rating:PropTypes.number.isRequired
-}
+import Movie from './Movie';
 
-const foodLike = [
-  {
-    id:1,
-    fav:'kimchi',
-    picture:'https://images.unsplash.com/photo-1542296332-2e4473faf563?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60',
-    rating:5
-  },
-  {
-    id:2,
-    fav:'ramen',
-    picture:'https://images.unsplash.com/photo-1561131668-f63504fc549d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1296&q=60',
-    rating:3
-  },
-  {
-    id:3,
-    fav:'choco',
-    picture:'https://images.unsplash.com/photo-1530521954074-e64f6810b32d?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1400&q=60',
-    rating:2.5
-  },
-  {
-    id:4,
-    fav:'candy',
-    picture:'https://images.unsplash.com/photo-1561101904-da649fcbf03f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1400&q=60',
-    rating:2
+import 'bootstrap/dist/css/bootstrap.min.css';
+import { Container, Row, Col, Spinner } from 'reactstrap';
+
+import './css/Movie.css'
+import './css/common.css'
+
+import jQuery from "jquery";
+window.$ = window.jQuery = jQuery;
+
+
+
+class App extends React.Component{
+  constructor(prop){
+    super(prop);
+    console.log(prop)
   }
-]
+  state = {
+    isLoading : true
+  }
+  getMovies = async() => {
+    const {data : {data:{movies}}} = await axios.get("https://yts-proxy.now.sh/list_movies.json?sort_by=rating");
+    // console.log(movies)
+    this.setState({
+      movies, isLoading : false
+    })
+  }
+  componentDidMount(){
+    // setTimeout(() => {
+    //   this.setState({isLoading:false})
+    // },6000)
+    this.getMovies();
+  }
+  setStar(value){
+    console.log('0')
 
-// function renderFood(dish){
-//   // console.log(dish)
-//   return <Food fav={dish.fav} picture={dish.picture} />
-// }
-
-function App() {
-  return (
-    <div>
-      {/* {console.log(foodLike.map(renderFood))} */}
-      {/* {foodLike.map(renderFood)} */}
-      {foodLike.map(dish => <Food key={dish.id} fav={dish.fav} picture={dish.picture} rating={dish.rating}/>)}
-      {/* <Food fav="kimchi" // something={true}
-      />
-      <Food fav="ramen"/>
-      <Food fav="choco"/>
-      <Food fav="candy"/> */}
-    </div>
-  );
+  }
+  render(){
+    const {isLoading, movies} = this.state;
+    return(
+      <>
+        <Container fluid>
+          <Row>     
+            <Container>
+              <Row>
+                <Col lg={12} className="h5 text-white font-weight-bolder mt-5 mb-5">현재 상영작</Col>
+                {isLoading ? 
+                <Col lg={12}>
+                  <Row>
+                    <Col md={12} className="h3 text-white font-weight-light">Loading...</Col>
+                    <Col md={12} className="text-danger">
+                      <Spinner animation="border" role="status">
+                        <span className="sr-only">Loading...</span>
+                      </Spinner>
+                    </Col>
+                  </Row>
+                </Col> : 
+                movies.map( (movie) => {
+                  // console.log('movie',movie)
+                  return (
+                    <Col sm={12} lg={6}>
+                      <Row>
+                        <Movie key={movie.id}  title={movie.title} year={movie.year} genres={movie.genres} rating={movie.rating} 
+                        summary={movie.summary} poster={movie.medium_cover_image}/>
+                      </Row>
+                    </Col>
+                  )
+                })}
+              </Row>  
+            </Container>
+          </Row>
+        </Container>        
+      </>
+    )
+  }
 }
 
 export default App;
+  
